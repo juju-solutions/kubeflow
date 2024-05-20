@@ -245,13 +245,6 @@ applications:
     series: focal
     _github_repo_name: pvcviewer-operator
     _github_repo_branch: track/1.8
-  seldon-controller-manager:
-    charm: seldon-core
-    channel: 1.17/stable
-    scale: 1
-    trust: true
-    _github_repo_name: seldon-core-operator
-    _github_repo_branch: track/1.17
   tensorboard-controller:
     charm: tensorboard-controller
     channel: 1.8/stable
