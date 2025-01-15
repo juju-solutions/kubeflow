@@ -25,60 +25,58 @@
       "future-beta": "3.6/beta"
     }
   },
-  "ckf-1.8-stable-mlflow-2.0-stable": {
-    "ckf":"1.8/stable",
-    "mlflow": "2.0/stable",
+  "ckf-1.9-stable-mlflow-2.15-stable": {
+    "ckf":"1.9/stable",
+    "mlflow": "2.15/stable",
     "k8s": {
       "charmed-kubernetes": {
         "min-supported": "1.24",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       },
       "microk8s": {
         "min-supported": "1.25",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       },
       "aks": {
         "min-supported": "1.27",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       },
       "eks": {
         "min-supported": "1.24",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       }
     },
     "juju": {
       "current-edge": "3.4/edge",
       "current-stable": "3.4/stable",
-      "future-edge": "3.5/edge",
-      "future-stable": "3.5/stable"
+      "future-beta": "3.6/beta"
     }
   },
-  "ckf-1.8-edge-mlflow-2.0-edge": {
-    "ckf":"1.8/edge",
-    "mlflow": "2.0/edge",
+  "ckf-1.9-edge-mlflow-2.15-edge": {
+    "ckf":"1.9/edge",
+    "mlflow": "2.15/edge",
     "k8s": {
       "charmed-kubernetes": {
         "min-supported": "1.24",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       },
       "microk8s": {
         "min-supported": "1.25",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       },
       "aks": {
         "min-supported": "1.27",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       },
       "eks": {
         "min-supported": "1.24",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       }
     },
     "juju": {
       "current-edge": "3.4/edge",
       "current-stable": "3.4/stable",
-      "future-edge": "3.5/edge",
-      "future-stable": "3.5/stable"
+      "future-beta": "3.6/beta"
     }
   },
   "ckf-latest-edge-mlflow-latest-edge": {
@@ -87,26 +85,25 @@
     "k8s": {
       "charmed-kubernetes": {
         "min-supported": "1.24",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       },
       "microk8s": {
         "min-supported": "1.25",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       },
       "aks": {
         "min-supported": "1.27",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       },
       "eks": {
         "min-supported": "1.24",
-        "max-supported": "1.29"
+        "max-supported": "1.30"
       }
     },
     "juju": {
       "current-edge": "3.4/edge",
       "current-stable": "3.4/stable",
-      "future-edge": "3.5/edge",
-      "future-stable": "3.5/stable"
+      "future-beta": "3.6/beta"
     }
   }
 }
