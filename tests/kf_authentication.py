@@ -8,9 +8,11 @@ from urllib.parse import parse_qs
 logging.basicConfig(level=logging.DEBUG)
 
 
-def kubeflow_login(host, username=None, password=None):
+def kubeflow_login(url, username=None, password=None):
     """Completes the dex/oidc login flow, returning the authservice_session cookie."""
-    host = host.rstrip('/')
+    parsed_url = urlparse(url)
+    url_base = f"{parsed_url.scheme}://{parsed_url.netloc}"
+
     data = {
         'login': username or os.getenv('KUBEFLOW_USERNAME', None),
         'password': password or os.getenv('KUBEFLOW_PASSWORD', None),
@@ -22,55 +24,38 @@ def kubeflow_login(host, username=None, password=None):
             " in KUBEFLOW_USERNAME/KUBEFLOW_PASSWORD environment variables."
         )
 
-    # GET on host provides us a location header with the dex auth page
-    # and state for this session
-    response = requests.get(host, verify=False, allow_redirects=False)
-    validate_response_status_code(response, [302], f"Failed to connect to host site '{host}'.")
-    location = response.headers['location']
+    # GET on url redirects us to the dex_login_url including state for this session
+    response = requests.get(url, verify=False, allow_redirects=True)
+    validate_response_status_code(response, [200], f"Failed to connect to url site '{url}'.")
+    dex_login_url = response.url
+    logging.debug(f"Redirected to dex_login_url of '{dex_login_url}'")
 
-    # Preserve only first portion of state if there are multiple, then rebuild
-    # the dex_url
-    state = parse_qs(location)['state'][0]
-    location_prefix, _ = location.split('state=')
-    location = location_prefix + f'state={state}'
-    dex_url = location
-    logging.debug(f"Redirected to dex_url of '{dex_url}'")
-
-    # GET on the dex_url provides the dex auth login url we can use and a
-    # request token
-    response = requests.get(dex_url, verify=False, allow_redirects=False)
-    validate_response_status_code(response, [302], f"Failed to connect to dex_url '{dex_url}'.")
-
-    if response.status_code != 302:
-        raise ValueError(
-            f"Failed to connect to host site.  "
-            f"Got response {response.status_code}, expected 302"
-        )
-    dex_login_partial_url = response.headers['location']
-    dex_login_url = f'{host}{dex_login_partial_url}'
-    logging.debug(f"Got dex_login_url with request token of '{dex_login_url}")
-
-    # Log in
+    # Log in, retrieving the redirection to the approval page
     response = requests.post(dex_login_url, data=data, verify=False, allow_redirects=False)
     validate_response_status_code(
-        response, [301, 303], f"Failed to log into dex - are your credentials correct?"
+        response, [303], f"Failed to log into dex - are your credentials correct?"
     )
-    dex_approval_partial_url = response.headers['location']
-    dex_approval_url = f'{host}{dex_approval_partial_url}'
-    logging.debug(f"Got dex_approval_url of '{dex_approval_url}")
+    approval_endpoint = response.headers['location']
+    dex_approval_url = url_base + approval_endpoint
+    logging.debug(f"Logged in with dex_approval_url of '{dex_approval_url}")
 
-    # GET and return the authservice_session cookie
+    # Get the OIDC approval code and state
     response = requests.get(dex_approval_url, verify=False, allow_redirects=False)
     validate_response_status_code(
-        response, [301, 303], f"Failed to connect to dex_approval_url '{dex_approval_url}'."
+        response, [303], f"Failed to connect to dex_approval_url '{dex_approval_url}'."
     )
-    authservice_partial_url = response.headers['location']
-    authservice_url = f"{host}{authservice_partial_url}"
+    authservice_endpoint = response.headers['location']
+    authservice_url = url_base + authservice_endpoint
     logging.debug(f"Got authservice_url of '{authservice_url}'")
 
-    response = requests.get(authservice_url, verify=False, allow_redirects=False)
+    # Access DEX OIDC path to generate session cookie
+    response = requests.get(
+        authservice_url,
+        verify=False,
+        allow_redirects=False,
+    )
     validate_response_status_code(
-        response, [301, 302], f"Failed to connect to authservice_url '{authservice_url}'."
+        response, [302], f"Failed to connect to authservice_url '{authservice_url}'."
     )
 
     return response.cookies['authservice_session']
