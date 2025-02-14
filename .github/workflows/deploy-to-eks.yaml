@@ -12,6 +12,9 @@ on:
       uats_branch:
         description: 'Branch to run the UATs from e.g. main or track/1.9. By default, this is defined by the dependencies.yaml file.'
         required: false
+      bundle_url:
+        description: 'URL to be used for version checking. In tracks prior to 1.10 release (track/1.8 and track/1.9), its value is hardcoded in the UATs. For main and track/1.10 branches this value can customized, despite sensible defaults are provided. Leave this empty unless you want to perform a custom check.'
+        required: false
   schedule:
     - cron: "23 0 * * 2"
 jobs:
@@ -65,6 +68,8 @@ jobs:
           echo "K8S_VERSION=${K8S_VERSION}" >> $GITHUB_ENV
           UATS_BRANCH=${{ inputs.uats_branch || env.UATS_BRANCH }}
           echo "UATS_BRANCH=${UATS_BRANCH}" >> $GITHUB_ENV
+          BUNDLE_URL=${{ inputs.bundle_url || env.BUNDLE_URL }}
+          echo "BUNDLE_URL=${BUNDLE_URL}" >> $GITHUB_ENV
 
       - name: Install CLI tools
         run: |
@@ -121,7 +126,14 @@ jobs:
           git clone https://github.com/canonical/charmed-kubeflow-uats.git ~/charmed-kubeflow-uats
           cd ~/charmed-kubeflow-uats
           git checkout ${{ env.UATS_BRANCH }}
-          tox -e kubeflow-remote
+          
+          EXTRA_ARGS=""
+          if [[ -n "${{env.BUNDLE_URL}}" ]];
+          then 
+            EXTRA_ARGS="-- --bundle-url ${{env.BUNDLE_URL}}"
+          fi
+          
+          tox -e kubeflow-remote $EXTRA_ARGS
 
       # On failure, capture debugging resources
       - name: Save debug artifacts
