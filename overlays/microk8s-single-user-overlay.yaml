@@ -1,0 +1,10 @@
+description: Bundle overlay to configure Kubeflow for a single default user on Microk8s
+applications:
+  dex-auth:
+    options:
+      public-url: http://10.64.140.43.nip.io
+      static-username: kubeflow-user
+      static-password: kubeflow-user
+  oidc-gatekeeper:
+    options:
+      public-url: http://10.64.140.43.nip.io
